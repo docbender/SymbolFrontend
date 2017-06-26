@@ -33,6 +33,10 @@ namespace SymbolFrontend
         { get; set; }
 
         [JsonProperty]
+        public string DeviceRename
+        { get; set; }        
+
+        [JsonProperty]
         public List<PointDefinition> Points
         { get; set; }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -120,8 +121,8 @@ namespace SymbolFrontend
             }
             catch (Exception ex)
             {
-                label4.Text = ex.ToString();
-                MessageBox.Show(ex.ToString());
+                label4.Text = ex.Message;
+                //MessageBox.Show(ex.ToString());
             }
         }
 
@@ -196,7 +197,7 @@ namespace SymbolFrontend
             {
                 await definitions.Load();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
@@ -246,7 +247,76 @@ namespace SymbolFrontend
 
         private void button6_Click(object sender, EventArgs e)
         {
-            symbols.Generate();
+            var dlg = new SymbolBrowserFrm(symbols);
+            dlg.Show(this);
         }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            var dlg = new DeviceListBrowserFrm(symbols);
+            dlg.Show(this);
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            if (!Directory.Exists(PointGeneratorCimplicity.Location))
+            {
+                try
+                {
+                    Directory.CreateDirectory(PointGeneratorCimplicity.Location);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            try
+            {
+                Process.Start(PointGeneratorCimplicity.Location);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            if (!Directory.Exists(PointGeneratorCimplicity.Location))
+            {
+                MessageBox.Show($"Cesta k pointům nenalezena ({PointGeneratorCimplicity.Location})", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                var files = Directory.EnumerateFiles(PointGeneratorCimplicity.Location, "*.txt");
+
+                if (files == null || files.Count() == 0)
+                {
+                    MessageBox.Show($"Adresář pointů neobsahuje žádné txt soubory", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var cimpath = Environment.GetEnvironmentVariable("CIMPATH");
+
+                if (!Directory.Exists(cimpath))
+                {
+                    MessageBox.Show($"Instalace Cimplicity nenalezena ({cimpath})", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var dlg = new ImportFrm(cimpath, "C:\\TPCH", files.ToArray());
+                dlg.ShowDialog(this);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
     }
 }

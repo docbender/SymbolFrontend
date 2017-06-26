@@ -18,8 +18,9 @@ namespace SymbolFrontend
             }
         }
 
-        public PointDeviceDefinition Get(DbStructure row)
+        public List<PointDeviceDefinition> Get(DbStructure row)
         {
+            var defs = new List<PointDeviceDefinition>();
 
             foreach (var i in this.Values)
             {
@@ -51,12 +52,12 @@ namespace SymbolFrontend
 
                 if (can)
                 {
-                    return i;
+                    defs.Add(i);
                 }
             }
 
-            
-            return null;
+
+            return defs;
         }
 
         public Task Load()

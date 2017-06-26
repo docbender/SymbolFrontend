@@ -78,6 +78,19 @@
     <Compile Include="DefinitionCollection.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="DeviceCollection.cs" />
+    <Compile Include="DeviceListBrowserFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeviceListBrowserFrm.Designer.cs">
+      <DependentUpon>DeviceListBrowserFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Import.cs" />
+    <Compile Include="ImportFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportFrm.Designer.cs">
+      <DependentUpon>ImportFrm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ISymbolData.cs" />
     <Compile Include="MainFrm.cs">
       <SubType>Form</SubType>
@@ -96,8 +109,20 @@
     <Compile Include="S7BrowseFrm.Designer.cs">
       <DependentUpon>S7BrowseFrm.cs</DependentUpon>
     </Compile>
+    <Compile Include="SymbolBrowserFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SymbolBrowserFrm.Designer.cs">
+      <DependentUpon>SymbolBrowserFrm.cs</DependentUpon>
+    </Compile>
     <Compile Include="SymbolTable.cs" />
     <Compile Include="Tables.cs" />
+    <EmbeddedResource Include="DeviceListBrowserFrm.resx">
+      <DependentUpon>DeviceListBrowserFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImportFrm.resx">
+      <DependentUpon>ImportFrm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainFrm.resx">
       <DependentUpon>MainFrm.cs</DependentUpon>
     </EmbeddedResource>
@@ -112,6 +137,9 @@
     </Compile>
     <EmbeddedResource Include="S7BrowseFrm.resx">
       <DependentUpon>S7BrowseFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SymbolBrowserFrm.resx">
+      <DependentUpon>SymbolBrowserFrm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

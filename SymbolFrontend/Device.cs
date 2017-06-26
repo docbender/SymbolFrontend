@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SymbolFrontend
 {
-    class Device
+    public class Device
     {
         public string Point
         {

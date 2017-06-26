@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SymbolFrontend
 {
-    class SymbolTable : ISymbolData
+    public class SymbolTable : ISymbolData
     {
         Dictionary<string, DeviceCollection> tables = null;
 

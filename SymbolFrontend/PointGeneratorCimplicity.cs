@@ -55,30 +55,32 @@ namespace SymbolFrontend
                 foreach (DbStructure i in db.Structure.Children)
                 {
 
-                    var d = definitions.Get(i);
+                    var dl = definitions.Get(i);
 
-                    if (d == null)
+                    if (dl == null)
                     {
                         logger.Error($"Nenalezena zadna definice pointu pro radek {i.ToString()}");
                         continue;
                     }
 
-
-                    foreach (var pd in d.Points)
+                    foreach (var d in dl)
                     {
-                        var ps = pointStructures.Get(pd.PointType);
-
-                        if (ps == null)
+                        foreach (var pd in d.Points)
                         {
-                            logger.Error($"Nenalezena zadna struktura pointu typu {pd.PointType} pro radek {i.ToString()}");
-                            continue;
+                            var ps = pointStructures.Get(pd.PointType);
+
+                            if (ps == null)
+                            {
+                                logger.Error($"Nenalezena zadna struktura pointu typu {pd.PointType} pro radek {i.ToString()}");
+                                continue;
+                            }
+
+                            var dlKey = Regex.IsMatch(i.Name, "(EDG)") ? "UPS" : Regex.IsMatch(i.Name, "(VN)") ? "VN" : "NN";
+                            var point = createPoint(db, i,  pd, d, ps, deviceLists[dlKey]);
+                            points.Add(point);
+
+                            //pokud je to point urciteho typu umoznit pretypovat na jine zarizeni napr spinac se signaly trafa
                         }
-
-                        var dlKey = Regex.IsMatch(i.Name, "(EDG)") ? "UPS" : Regex.IsMatch(i.Name, "(VN)") ? "VN" : "NN";
-                        var point = createPoint(db, i, pd, ps, deviceLists[dlKey]);
-                        points.Add(point);
-
-                        //pokud je to point urciteho typu umoznit pretypovat na jine zarizeni napr spinac se signaly trafa
                     }
                 }
 
@@ -87,11 +89,30 @@ namespace SymbolFrontend
         }
 
         static CimplicityPointStructure createPoint(DbClass db, DbStructure dbRow, PointDefinition definition, 
-            CimplicityPointStructure structure, DeviceCollection deviceList)
+            PointDeviceDefinition deviceDefinition, CimplicityPointStructure structure, DeviceCollection deviceList)
         {
             var s = structure.Clone();
 
             var prefix = dbRow.Comment.Substring(0, dbRow.Comment.IndexOf('-')).Trim().Replace(" ", ".");
+
+            if(deviceDefinition.DeviceRename !=null)
+            {
+                var pairs = deviceDefinition.DeviceRename.Split(';');
+
+                foreach(var str in pairs)
+                {
+                    var pair = str.Split('|');
+
+                    if(pair.Length > 1)
+                    {
+                        if (prefix.Contains(pair[0]))
+                        {
+                            prefix = prefix.Replace(pair[0], pair[1]);
+                            break;
+                        }
+                    }
+                }
+            }
 
             var deviceDescription = GetDescription(db, dbRow, prefix, deviceList);
             var datablock = $"DB{db.Number}";
@@ -178,7 +199,7 @@ namespace SymbolFrontend
             var symbol = deviceList.FirstOrDefault(x => x.Point.Equals(device, StringComparison.InvariantCultureIgnoreCase));
 
             if(symbol==null)
-                logger.Error($"Nenalezena zadna definice pointu {device} v seznamu zarizeni");
+                logger.Error($"Nenalezena zadna definice pointu {device}-{dbRow.Address} v seznamu zarizeni");
 
             return symbol?.Tooltip;
         }
@@ -198,7 +219,7 @@ namespace SymbolFrontend
                     .Concat(properties.Select(p => (p.GetValue(o, null) ?? "").ToString())).ToArray()));
             }
 
-            File.WriteAllLines(file, lines);
+            File.WriteAllLines(file, lines, Encoding.GetEncoding(1250));
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SymbolFrontend
 {
-    class DeviceCollection : List<Device>
+    public class DeviceCollection : List<Device>
     {
         public string Name
         {

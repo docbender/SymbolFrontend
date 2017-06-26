@@ -28,9 +28,18 @@ namespace SymbolFrontend
         public string ALARM_DELAY_UNIT_HIHI { get; set; }
         public string ALARM_DELAY_UNIT_LO { get; set; }
         public string ALARM_DELAY_UNIT_LOLO { get; set; }
+        public int ALARM_OFF_DELAY_HI { get; set; }
+        public int ALARM_OFF_DELAY_HIHI { get; set; }
+        public int ALARM_OFF_DELAY_LO { get; set; }
+        public int ALARM_OFF_DELAY_LOLO { get; set; }
+        public string ALARM_OFF_DELAY_UNIT_HI { get; set; }
+        public string ALARM_OFF_DELAY_UNIT_HIHI { get; set; }
+        public string ALARM_OFF_DELAY_UNIT_LO { get; set; }
+        public string ALARM_OFF_DELAY_UNIT_LOLO { get; set; }
         public string ALARM_PUBLISH { get; set; }
         public string ALM_CLASS { get; set; }
         public string ALM_CRITERIA { get; set; }
+        public string ALM_CRITERIA_EX { get; set; }
         public string ALM_DEADBAND { get; set; }
         public int ALM_DELAY { get; set; }
         public string ALM_ENABLE { get; set; }
@@ -40,6 +49,7 @@ namespace SymbolFrontend
         public string ALM_LOW_1 { get; set; }
         public string ALM_LOW_2 { get; set; }
         public string ALM_MSG { get; set; }
+        public string ALM_OFF_DELAY { get; set; }
         public string ALM_ROUTE_OPER { get; set; }
         public string ALM_ROUTE_SYSMGR { get; set; }
         public string ALM_ROUTE_USER { get; set; }
@@ -89,6 +99,7 @@ namespace SymbolFrontend
         public string LOG_ACK_LO { get; set; }
         public string LOG_ACK_LOLO { get; set; }
         public int LOG_DATA { get; set; }
+        public int LOG_DATA_HISTORIAN { get; set; }
         public string LOG_DEL_HI { get; set; }
         public string LOG_DEL_HIHI { get; set; }
         public string LOG_DEL_LO { get; set; }
