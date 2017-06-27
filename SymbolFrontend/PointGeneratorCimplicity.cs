@@ -75,11 +75,8 @@ namespace SymbolFrontend
                                 continue;
                             }
 
-                            var dlKey = Regex.IsMatch(i.Name, "(EDG)") ? "UPS" : Regex.IsMatch(i.Name, "(VN)") ? "VN" : "NN";
-                            var point = createPoint(db, i,  pd, d, ps, deviceLists[dlKey]);
-                            points.Add(point);
-
-                            //pokud je to point urciteho typu umoznit pretypovat na jine zarizeni napr spinac se signaly trafa
+                            var point = createPoint(db, i, pd, d, ps, deviceLists);
+                            points.Add(point);                            
                         }
                     }
                 }
@@ -88,22 +85,22 @@ namespace SymbolFrontend
             });
         }
 
-        static CimplicityPointStructure createPoint(DbClass db, DbStructure dbRow, PointDefinition definition, 
-            PointDeviceDefinition deviceDefinition, CimplicityPointStructure structure, DeviceCollection deviceList)
+        static CimplicityPointStructure createPoint(DbClass db, DbStructure dbRow, PointDefinition definition,
+            PointDeviceDefinition deviceDefinition, CimplicityPointStructure structure, Dictionary<string, DeviceCollection> deviceLists)
         {
             var s = structure.Clone();
 
             var prefix = dbRow.Comment.Substring(0, dbRow.Comment.IndexOf('-')).Trim().Replace(" ", ".");
 
-            if(deviceDefinition.DeviceRename !=null)
+            if (deviceDefinition.DeviceRename != null)
             {
                 var pairs = deviceDefinition.DeviceRename.Split(';');
 
-                foreach(var str in pairs)
+                foreach (var str in pairs)
                 {
                     var pair = str.Split('|');
 
-                    if(pair.Length > 1)
+                    if (pair.Length > 1)
                     {
                         if (prefix.Contains(pair[0]))
                         {
@@ -114,7 +111,16 @@ namespace SymbolFrontend
                 }
             }
 
-            var deviceDescription = GetDescription(db, dbRow, prefix, deviceList);
+            var dlKey = Regex.IsMatch(dbRow.Comment, "(NN)") ? "NN" : 
+                Regex.IsMatch(dbRow.Comment, "(VN)") ? "VN" : 
+                Regex.IsMatch(dbRow.Comment, "(EDG)") ? "UPS" : "";
+            Device deviceSymbol = null;
+            if (dlKey.Length > 0)
+                deviceSymbol = deviceLists[dlKey].FirstOrDefault(y => y.Point.Equals(prefix, StringComparison.InvariantCultureIgnoreCase));
+            if (deviceSymbol == null)
+                deviceSymbol = deviceLists.SelectMany(x => x.Value.Where(y => y.Point.Equals(prefix, StringComparison.InvariantCultureIgnoreCase))).FirstOrDefault();
+
+            var deviceDescription = GetDescription(db, dbRow, prefix, deviceSymbol);
             var datablock = $"DB{db.Number}";
             int baseAddress = dbRow.Address.ByteAddress;
 
@@ -194,12 +200,12 @@ namespace SymbolFrontend
                 return "OSTATNE";
         }
 
-        static string GetDescription(DbClass db, DbStructure dbRow, string device, DeviceCollection deviceList)
+        static string GetDescription(DbClass db, DbStructure dbRow, string device, Device symbol)
         {
-            var symbol = deviceList.FirstOrDefault(x => x.Point.Equals(device, StringComparison.InvariantCultureIgnoreCase));
+            //var symbol = deviceList.FirstOrDefault(x => x.Point.Equals(device, StringComparison.InvariantCultureIgnoreCase));
 
-            if(symbol==null)
-                logger.Error($"Nenalezena zadna definice pointu {device}-{dbRow.Address} v seznamu zarizeni");
+            if (symbol == null)
+                logger.Error($"Nenalezena zadna definice pointu {device}-DB{db.Number}.{dbRow.Address} v seznamu zarizeni");
 
             return symbol?.Tooltip;
         }

@@ -1,4 +1,7 @@
-﻿using System;
+﻿using log4net;
+using log4net.Appender;
+using log4net.Repository.Hierarchy;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,6 +17,8 @@ namespace SymbolFrontend
 {
     public partial class MainFrm : Form
     {
+        private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         access db = new access();
         SymbolTable symbols = new SymbolTable();
         DefinitionCollection definitions = new DefinitionCollection();
@@ -217,6 +222,9 @@ namespace SymbolFrontend
             Cursor.Current = Cursors.WaitCursor;
             button5.Enabled = false;
 
+            Hierarchy hierarchy = LogManager.GetRepository() as Hierarchy;
+            MemoryAppender mappender = hierarchy.Root.GetAppender("MemoryAppender") as MemoryAppender;
+
             try
             {
                 var dL = checkBox1.Checked ? symbols.GetDeviceLists() : db.GetDeviceLists();
@@ -225,6 +233,8 @@ namespace SymbolFrontend
                     MessageBox.Show("Nepodařilo se získat seznam zařízení. Generování zastaveno.", "Upozornění", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
+
+                mappender.Clear();
                 await PointGeneratorCimplicity.Run(SelectedDb, definitions, pointStructures, dL);
             }
             catch (AggregateException ex)
@@ -235,9 +245,21 @@ namespace SymbolFrontend
             {
                 MessageBox.Show(string.Join("\n", ex.Message), "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                button5.Enabled = true;
+                Cursor.Current = Cursors.Default;
+            }
 
-            button5.Enabled = true;
-            Cursor.Current = Cursors.Default;
+            var ev = mappender.PopAllEvents();
+            if (ev != null && ev.Length > 0)
+            {
+                if(MessageBox.Show("Během generování se vyskytly chyby. Chceš je zobrazit?", "Upozornění", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    var dlg = new LogFrm(ev.Select(x=>x.RenderedMessage).ToArray());
+                    dlg.ShowDialog(this);
+                }
+            }
         }
 
         private void MainFrm_FormClosing(object sender, FormClosingEventArgs e)
@@ -248,13 +270,13 @@ namespace SymbolFrontend
         private void button6_Click(object sender, EventArgs e)
         {
             var dlg = new SymbolBrowserFrm(symbols);
-            dlg.Show(this);
+            dlg.Show();
         }
 
         private void button9_Click(object sender, EventArgs e)
         {
             var dlg = new DeviceListBrowserFrm(symbols);
-            dlg.Show(this);
+            dlg.Show();
         }
 
         private void button7_Click(object sender, EventArgs e)

@@ -1,5 +1,6 @@
 ﻿using DotNetSiemensPLCToolBoxLibrary.DataTypes.Projectfolders;
 using DotNetSiemensPLCToolBoxLibrary.Projectfiles;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,8 @@ namespace SymbolFrontend
 {
     public class SymbolTable : ISymbolData
     {
+        private static readonly ILog logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         Dictionary<string, DeviceCollection> tables = null;
 
 
@@ -46,10 +49,8 @@ namespace SymbolFrontend
             Project tmp = Projects.LoadProject(Properties.Settings.Default.projectpath, false);
             var prj = tmp as Step7ProjectV5;
 
-
             if (prj == null)
                 return;
-
 
             if (prj.BlocksOfflineFolders.FirstOrDefault(x => x.StructuredFolderName.Equals(Properties.Settings.Default.projectfolder)) == null)
                 return;
@@ -69,6 +70,40 @@ namespace SymbolFrontend
             GetTable("VN", "(_VN_)");
             GetTable("UPS", "(_EDG_)");
 
+            GetCustomTables();
+        }
+
+        public static string Location
+        {
+            get
+            {
+                return System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetAssembly(typeof(DefinitionCollection)).Location) + @"\definitions";
+            }
+        }
+
+        private void GetCustomTables()
+        {
+            if (!Directory.Exists(Location))
+                return;
+
+            try
+            {
+                var files = Directory.GetFiles(Location, "*.jsond");
+
+                foreach (var f in files)
+                {
+                    var d = DeviceCollection.Deserialize(File.ReadAllText(f));
+                    if (d.Name == null)
+                        d.Name = Path.GetFileNameWithoutExtension(f);
+
+                    if (!tables.ContainsKey(d.Name))
+                        tables.Add(d.Name, d);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"GetCustomTables error: {ex.Message}");
+            }
         }
 
         private DeviceCollection GetTable(string name, string pattern)

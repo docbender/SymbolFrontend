@@ -85,6 +85,12 @@
       <DependentUpon>DeviceListBrowserFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="Import.cs" />
+    <Compile Include="LogFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LogFrm.Designer.cs">
+      <DependentUpon>LogFrm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ImportFrm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -109,6 +115,12 @@
     <Compile Include="S7BrowseFrm.Designer.cs">
       <DependentUpon>S7BrowseFrm.cs</DependentUpon>
     </Compile>
+    <Compile Include="SearchFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SearchFrm.Designer.cs">
+      <DependentUpon>SearchFrm.cs</DependentUpon>
+    </Compile>
     <Compile Include="SymbolBrowserFrm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -119,6 +131,9 @@
     <Compile Include="Tables.cs" />
     <EmbeddedResource Include="DeviceListBrowserFrm.resx">
       <DependentUpon>DeviceListBrowserFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LogFrm.resx">
+      <DependentUpon>LogFrm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ImportFrm.resx">
       <DependentUpon>ImportFrm.cs</DependentUpon>
@@ -137,6 +152,9 @@
     </Compile>
     <EmbeddedResource Include="S7BrowseFrm.resx">
       <DependentUpon>S7BrowseFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SearchFrm.resx">
+      <DependentUpon>SearchFrm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SymbolBrowserFrm.resx">
       <DependentUpon>SymbolBrowserFrm.cs</DependentUpon>

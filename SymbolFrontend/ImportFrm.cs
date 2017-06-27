@@ -87,7 +87,7 @@ namespace SymbolFrontend
                 else
                 {
                     label1.Text = $"Import proběhl bez chyb";
-                    label1.ForeColor = Color.Black;
+                    label1.ForeColor = Color.White;
                 }
             }
         }
