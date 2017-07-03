@@ -339,6 +339,13 @@ namespace SymbolFrontend
             }
         }
 
+        private void listBox2_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (listBox2.SelectedItem == null)
+                return;
 
+            var dlg = new DbViewFrm(listBox2.SelectedItem as DbClass, Properties.Settings.Default.projectpath);
+            dlg.Show();
+        }
     }
 }

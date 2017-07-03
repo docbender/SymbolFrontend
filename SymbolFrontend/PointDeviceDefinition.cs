@@ -16,26 +16,68 @@ namespace SymbolFrontend
             Points = new List<PointDefinition>();
         }
 
+        /// <summary>
+        /// Definition name
+        /// </summary>
         [JsonProperty]
         public string Name
         { get; set; }
 
+        /// <summary>
+        /// Simatic datablock row datatype
+        /// </summary>
+        /// <example>UDTxx, BOOL, WORD,...</example>
         [JsonProperty]
         public string TypeRestriction
         { get; set; }
 
+        /// <summary>
+        /// Device name restriction (regex)
+        /// </summary>
+        /// <example>"_Rdy$" - only neme ended with "_Rdy"</example>
         [JsonProperty]
         public string DeviceRestriction
         { get; set; }
 
+        /// <summary>
+        /// Enable remove name part matched by restriction regex
+        /// </summary>
+        [JsonProperty]
+        public bool RemoveDeviceRestrictionFromDeviceName
+        { get; set; } = false;
+
+        /// <summary>
+        /// Use symbol as device name (normally comment is used)
+        /// </summary>
+        [JsonProperty]
+        public bool UseSymbolAsDeviceName
+        { get; set; } = false;
+
+        /// <summary>
+        /// Comment name restriction (regex)
+        /// </summary>
         [JsonProperty]
         public string CommentRestriction
         { get; set; }
 
+        /// <summary>
+        /// Key|Value pairs (delimited by semicolon) used to rename device name
+        /// </summary>
+        /// <example>"1AN11.1QA|1T11;1AN12.1QA|1T12"</example>
         [JsonProperty]
         public string DeviceRename
-        { get; set; }        
+        { get; set; }
 
+        /// <summary>
+        /// Device Cimplicity resource
+        /// </summary>
+        [JsonProperty]
+        public string Resource
+        { get; set; } = "OSTATNE";
+
+        /// <summary>
+        /// Device point definitions list
+        /// </summary>
         [JsonProperty]
         public List<PointDefinition> Points
         { get; set; }

@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace SymbolFrontend
 {
@@ -69,8 +70,19 @@ namespace SymbolFrontend
 
         private void LoadProject(string projectPath)
         {
+            if (!File.Exists(projectPath))
+            {
+                MessageBox.Show($"Projekt {projectPath} neexistuje", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             Project tmp = Projects.LoadProject(projectPath, false);
             var prj = tmp as Step7ProjectV5;
+
+            if (prj == null)
+            {
+                MessageBox.Show($"Projekt {projectPath} se nepoddařilo otevřít", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
 
             if (prj != null)
@@ -169,7 +181,7 @@ namespace SymbolFrontend
                 Name = db.BlockName,
                 Number = db.BlockNumber,
                 Items = db.Structure.Children.Count,
-                ItemDependencies = string.Join(";", db.Dependencies),
+                ItemDependencies = string.Join(";", db.Structure.Children.Select(x =>(x as S7DataRow).DataTypeAsString).Distinct()),
                 Path = db.ParentFolder.ToString(),
                 Structure = new SymbolFrontend.DbStructure(db.Structure)
             };

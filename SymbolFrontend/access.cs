@@ -75,7 +75,7 @@ namespace SymbolFrontend
                 using (var cmd = db.CreateCommand())
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.CommandText = $"SELECT [point], [Comment], [description], [tooltip], [DeviceSymbol], [Comment] FROM [{table}]";
+                    cmd.CommandText = $"SELECT [point], [Comment], [description], [tooltip], [DeviceSymbol], [Comment], [Location] FROM [{table}]";
 
                     try
                     {
@@ -91,6 +91,7 @@ namespace SymbolFrontend
                                 Description = reader.IsDBNull(2) ? null : reader.GetString(2),
                                 AlarmDescription = reader.IsDBNull(5) ? null : reader.GetString(5),
                                 DeviceSymbol = reader.IsDBNull(4) ? null : reader.GetString(4),
+                                Location = reader.IsDBNull(5) ? null : reader.GetString(5),
                                 Tooltip = reader.IsDBNull(3) ? null : reader.GetString(3) });
                         }
                     }

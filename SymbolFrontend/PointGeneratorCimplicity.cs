@@ -76,7 +76,8 @@ namespace SymbolFrontend
                             }
 
                             var point = createPoint(db, i, pd, d, ps, deviceLists);
-                            points.Add(point);                            
+                            if (point != null)
+                                points.Add(point);
                         }
                     }
                 }
@@ -89,8 +90,16 @@ namespace SymbolFrontend
             PointDeviceDefinition deviceDefinition, CimplicityPointStructure structure, Dictionary<string, DeviceCollection> deviceLists)
         {
             var s = structure.Clone();
-
-            var prefix = dbRow.Comment.Substring(0, dbRow.Comment.IndexOf('-')).Trim().Replace(" ", ".");
+            string prefix;
+            if (deviceDefinition.UseSymbolAsDeviceName)
+            {
+                if (deviceDefinition.DeviceRestriction != null && deviceDefinition.DeviceRestriction.Length > 0 && deviceDefinition.RemoveDeviceRestrictionFromDeviceName)
+                    prefix = Regex.Replace(dbRow.Name, deviceDefinition.DeviceRestriction, "").Replace("_", ".");
+                else
+                    prefix = dbRow.Name.Replace("_", ".");
+            }
+            else
+                prefix = dbRow.Comment.Substring(0, dbRow.Comment.IndexOf('-')).Trim().Replace(" ", ".");
 
             if (deviceDefinition.DeviceRename != null)
             {
@@ -111,20 +120,24 @@ namespace SymbolFrontend
                 }
             }
 
-            var dlKey = Regex.IsMatch(dbRow.Comment, "(NN)") ? "NN" : 
-                Regex.IsMatch(dbRow.Comment, "(VN)") ? "VN" : 
+            var dlKey = Regex.IsMatch(dbRow.Comment, "(NN)") ? "NN" :
+                Regex.IsMatch(dbRow.Comment, "(VN)") ? "VN" :
                 Regex.IsMatch(dbRow.Comment, "(EDG)") ? "UPS" : "";
             Device deviceSymbol = null;
             if (dlKey.Length > 0)
                 deviceSymbol = deviceLists[dlKey].FirstOrDefault(y => y.Point.Equals(prefix, StringComparison.InvariantCultureIgnoreCase));
             if (deviceSymbol == null)
                 deviceSymbol = deviceLists.SelectMany(x => x.Value.Where(y => y.Point.Equals(prefix, StringComparison.InvariantCultureIgnoreCase))).FirstOrDefault();
+            if (deviceSymbol == null)
+            {
+                logger.Error($"Nenalezeno zarizeni pro point {prefix} z DB{db.Number}.{dbRow.Address}");
+                return null;
+            }
 
-            var deviceDescription = GetDescription(db, dbRow, prefix, deviceSymbol);
             var datablock = $"DB{db.Number}";
-            int baseAddress = dbRow.Address.ByteAddress;
 
-            s.RESOURCE_ID = GetResource(db, dbRow, prefix);
+
+            s.RESOURCE_ID = deviceDefinition.Resource;
             s.PT_ID = $"{prefix}{definition.Sufix}";
             s.DESC = definition.Description;
             s.PT_TYPE = definition.DataType;
@@ -139,13 +152,20 @@ namespace SymbolFrontend
                 s.UPDATE_CRITERIA = "UC";
                 s.POLL_AFTER_SET = definition.PoolAfterSet ? "1" : "0";
 
-                var address = definition.DeviceAddress != null && definition.DeviceAddress.Length > 0
-                    ? (definition.PlcArea.Equals("DBX", StringComparison.InvariantCultureIgnoreCase)
-                        ? $"{datablock}.{definition.PlcArea}{baseAddress + definition.PlcAddressByte}.{definition.PlcAddressBit}"
-                        : (definition.PlcArea.Equals("DBDF", StringComparison.InvariantCultureIgnoreCase)
-                            ? $"{datablock}.DBD{baseAddress + definition.PlcAddressByte}:REAL"
-                            : $"{datablock}.{definition.PlcArea}{baseAddress + definition.PlcAddressByte}"))
-                    : datablock + definition.DeviceAddress;
+                string address;
+                if (definition.DeviceAddress != null && definition.DeviceAddress.Length > 0)
+                    address = datablock + definition.DeviceAddress;
+                else
+                {
+                    int baseAddress = dbRow.Address.ByteAddress * 8 + dbRow.Address.BitAddress;
+                    int itemAddress = baseAddress + definition.PlcAddressByte * 8 + definition.PlcAddressBit;
+
+                    address = (definition.PlcArea.Equals("DBX", StringComparison.InvariantCultureIgnoreCase)
+                            ? $"{datablock}.DBX{itemAddress / 8}.{itemAddress % 8}"
+                            : (definition.PlcArea.Equals("DBDF", StringComparison.InvariantCultureIgnoreCase)
+                                ? $"{datablock}.DBD{itemAddress / 8}:REAL"
+                                : $"{datablock}.{definition.PlcArea}{itemAddress / 8}"));
+                }
 
                 if (definition.OpcGroup != null && definition.OpcGroup.Length > 0)
                     s.ADDR = $"$[{definition.OpcGroup}]ns=2;s=TPCH.PLC.{address}";
@@ -155,8 +175,10 @@ namespace SymbolFrontend
 
             if (definition.AlarmEnabled)
             {
+                var deviceDescription = GetDeviceAlarmDescription(db, dbRow, prefix, deviceSymbol);
+
                 s.ALM_ENABLE = "1";
-                s.ALM_CLASS = definition.AlarmClass;
+                s.ALM_CLASS = GetAlarmClass(definition.AlarmClass, deviceSymbol); //;
                 s.ALM_HIGH_2 = definition.AlarmLimit.ToString();
                 s.ALM_MSG = deviceDescription + " - " + definition.AlarmMessage;
 
@@ -192,22 +214,27 @@ namespace SymbolFrontend
             return s;
         }
 
-        static string GetResource(DbClass db, DbStructure dbRow, string device)
+        static string GetAlarmClass(string sourceClass, Device symbol)
         {
-            if (Regex.IsMatch(dbRow.Comment, "(NN)|(VN)|(EDG)"))
-                return "ENERGIA";
+            if (!sourceClass.Equals("E") && Regex.IsMatch(symbol.DeviceSymbol, "(NN)|(VN)|(EDG)"))
+            {
+                if (symbol.Location != null && symbol.Location.Equals("PTO1") || symbol.Location.Equals("PTO2"))
+                    return $"{sourceClass}EP";
+                else
+                    return $"{sourceClass}ET";
+            }
             else
-                return "OSTATNE";
+                return sourceClass;
         }
 
-        static string GetDescription(DbClass db, DbStructure dbRow, string device, Device symbol)
+        static string GetDeviceAlarmDescription(DbClass db, DbStructure dbRow, string device, Device symbol)
         {
             //var symbol = deviceList.FirstOrDefault(x => x.Point.Equals(device, StringComparison.InvariantCultureIgnoreCase));
 
             if (symbol == null)
                 logger.Error($"Nenalezena zadna definice pointu {device}-DB{db.Number}.{dbRow.Address} v seznamu zarizeni");
 
-            return symbol?.Tooltip;
+            return symbol?.AlarmDescription;
         }
 
         static void ToCsv<T>(IEnumerable<T> list, string file)

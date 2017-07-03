@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,6 +17,7 @@ namespace SymbolFrontend
     {
         string cimpath, project;
         string[] files;
+        string logFile = "";
 
         public ImportFrm()
         {
@@ -67,6 +70,7 @@ namespace SymbolFrontend
                 listBox1.Items.Add($"{DateTime.Now.ToLongTimeString()}: Import pointů dokončen");
 
                 int errors = 0;
+                
                 foreach (string line in listBox1.Items)
                 {
                     var m = Regex.Match(line, "((\\d*) errors)");
@@ -89,6 +93,20 @@ namespace SymbolFrontend
                     label1.Text = $"Import proběhl bez chyb";
                     label1.ForeColor = Color.White;
                 }
+
+                logFile = "";
+                foreach (string line in listBox1.Items)
+                {
+                    var m = Regex.Match(line, @"(LOG_PATH:(.*\.log))");
+
+                    if (m.Success)
+                    {
+                        logFile = m.Groups[2].Value;
+                        break;                    
+                    }
+                }
+
+                button3.Enabled = logFile.Length > 0;
             }
         }
 
@@ -98,6 +116,52 @@ namespace SymbolFrontend
                 listBox1.Invoke(new MethodInvoker(() => listBox1.Items.Add($"{DateTime.Now.ToLongTimeString()}: {line}")));
             else
                 listBox1.Items.Add($"{DateTime.Now.ToLongTimeString()}: {line}");
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            ShowLog();
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedItem == null)
+                return;
+
+            var m = Regex.Match(listBox1.SelectedItem.ToString(), @"(LOG_PATH:(.*\.log))");
+
+            if (m.Success)
+                logFile = m.Groups[2].Value;
+            else
+                logFile = "";
+
+            button3.Enabled = logFile.Length > 0;
+        }
+
+        void ShowLog()
+        {
+            if (logFile.Length == 0)
+                return;
+
+            var file = $"{project}\\log\\{logFile}";
+
+            if (!File.Exists(file))
+            {
+                MessageBox.Show($"Soubor {file} neexistuje", "Upozornění", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                using (var p = Process.Start(file))
+                {
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Chyba při otevírání souboru {file}. {ex.Message}", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

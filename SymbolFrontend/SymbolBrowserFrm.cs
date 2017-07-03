@@ -26,13 +26,12 @@ namespace SymbolFrontend
             this.symbols = symbols;
             symbols.Generate();
             dataGridView1.DataSource = new BindingSource { DataSource = symbols.Symbols };
-            label1.Text = $"{dataGridView1.RowCount} symbolů";
-            dataGridView1.AutoResizeColumns();
+            label1.Text = $"{dataGridView1.RowCount} symbolů";            
         }
 
         private void SymbolBrowserFrm_Load(object sender, EventArgs e)
         {
-
+            dataGridView1.AutoResizeColumns();
         }
 
         private void button1_Click(object sender, EventArgs e)

@@ -75,6 +75,12 @@
     <Compile Include="DbClass.cs" />
     <Compile Include="DbCollection.cs" />
     <Compile Include="DbStructure.cs" />
+    <Compile Include="DbViewFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DbViewFrm.Designer.cs">
+      <DependentUpon>DbViewFrm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DefinitionCollection.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="DeviceCollection.cs" />
@@ -129,6 +135,9 @@
     </Compile>
     <Compile Include="SymbolTable.cs" />
     <Compile Include="Tables.cs" />
+    <EmbeddedResource Include="DbViewFrm.resx">
+      <DependentUpon>DbViewFrm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DeviceListBrowserFrm.resx">
       <DependentUpon>DeviceListBrowserFrm.cs</DependentUpon>
     </EmbeddedResource>

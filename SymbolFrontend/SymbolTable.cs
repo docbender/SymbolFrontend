@@ -126,6 +126,7 @@ namespace SymbolFrontend
                 Description = GetDescription(x.key.device, x.value.Comment),
                 Tooltip = GetToolTip(x.key.device, x.value.Comment),
                 AlarmDescription = GetAlarmDescription(x.key.device, x.value.Comment),
+                Location = x.value.Symbol.Substring(0,x.value.Symbol.IndexOf("_"))
             }));
 
 

@@ -39,6 +39,11 @@ namespace SymbolFrontend
             get; set;
         }
 
+        public string Location
+        {
+            get; set;
+        }
+
         public override string ToString()
         {
             return $"Point={Point}";

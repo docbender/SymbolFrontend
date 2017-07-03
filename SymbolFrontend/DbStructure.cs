@@ -32,24 +32,39 @@ namespace SymbolFrontend
             }
         }
 
+        /// <summary>
+        /// Address
+        /// </summary>
         [JsonProperty]
         public AddressClass Address { get; protected set; }
 
+        /// <summary>
+        /// Rows
+        /// </summary>
         [JsonProperty]
         public override List<IDataRow> Children { get; protected set; }
 
-        // [JsonProperty]
-        //public override int ByteLength { get; protected set; }
-
+        /// <summary>
+        /// Name
+        /// </summary>
         [JsonProperty]
         public override string Name { get; set; }
 
+        /// <summary>
+        /// Comment
+        /// </summary>
         [JsonProperty]
         public override string Comment { get; set; }
 
+        /// <summary>
+        /// DataType
+        /// </summary>
         [JsonProperty]
         public string DataTypeField { get; set; }
 
+        /// <summary>
+        /// Return type as string
+        /// </summary>
         public override string DataTypeAsString { get { return DataTypeField; } }
     }
     }
