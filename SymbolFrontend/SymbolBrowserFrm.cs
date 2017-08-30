@@ -61,6 +61,7 @@ namespace SymbolFrontend
                 {
                     var dlg = new SearchFrm();
                     dlg.Input = searchtext;
+                    dlg.StartPosition = FormStartPosition.CenterParent;
                     //show input dialog
                     if (dlg.ShowDialog(this) == DialogResult.OK)
                     {

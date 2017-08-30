@@ -104,6 +104,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "SearchFrm";
+            this.Opacity = 0.9D;
             this.Text = "Hledat...";
             this.ResumeLayout(false);
             this.PerformLayout();

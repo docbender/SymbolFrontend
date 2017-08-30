@@ -182,7 +182,7 @@ namespace SymbolFrontend
                 Number = db.BlockNumber,
                 Items = db.Structure.Children.Count,
                 ItemDependencies = string.Join(";", db.Structure.Children.Select(x =>(x as S7DataRow).DataTypeAsString).Distinct()),
-                Path = db.ParentFolder.ToString(),
+                Path = db.ParentFolder.StructuredFolderName,
                 Structure = new SymbolFrontend.DbStructure(db.Structure)
             };
 

@@ -61,11 +61,19 @@ namespace SymbolFrontend
         { get; set; }
 
         /// <summary>
-        /// Key|Value pairs (delimited by semicolon) used to rename device name
+        /// Key|Value pairs (delimited by semicolon) used to rename device name. Rename uses regex.
         /// </summary>
         /// <example>"1AN11.1QA|1T11;1AN12.1QA|1T12"</example>
         [JsonProperty]
         public string DeviceRename
+        { get; set; }
+
+        /// <summary>
+        /// Key|Value pairs (delimited by semicolon) used to find aliased device name (Regex).
+        /// </summary>
+        /// <example>"1AN11.1QA|1T11;1AN12.1QA|1T12"</example>
+        [JsonProperty]
+        public string DeviceAlias
         { get; set; }
 
         /// <summary>

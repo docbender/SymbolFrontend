@@ -256,8 +256,8 @@ namespace SymbolFrontend
             {
                 if(MessageBox.Show("Během generování se vyskytly chyby. Chceš je zobrazit?", "Upozornění", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    var dlg = new LogFrm(ev.Select(x=>x.RenderedMessage).ToArray());
-                    dlg.ShowDialog(this);
+                    var dlg = new LogFrm(ev.OrderBy(x => x.Properties["datablock"]).Select(x=>x.RenderedMessage).ToArray());
+                    dlg.Show(this);
                 }
             }
         }

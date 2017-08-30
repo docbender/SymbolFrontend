@@ -113,15 +113,15 @@ namespace SymbolFrontend
 
             var signals = Symbols.Where(x => Regex.IsMatch(x.Symbol, pattern));
 
-            var x1 = signals.First().Symbol.Substring(0, signals.First().Symbol.IndexOf('_'));
-            var x2 = GetDevice(signals.First().Symbol, name);
+            //var x1 = signals.First().Symbol.Substring(0, signals.First().Symbol.IndexOf('_'));
+            ///var x2 = GetDevice(signals.First().Symbol, name);
 
             var devicesOrdered = signals.GroupBy(x => new { location = x.Symbol.Substring(0, x.Symbol.IndexOf('_')), device = GetDevice(x.Symbol, name) }).Select(g => new { key = g.Key, value = g.First() }).OrderBy(o => o.key.device);
 
             devices.AddRange(devicesOrdered.Select(x => new Device()
             {
-                DeviceSymbol = x.value.Symbol.Substring(0, x.value.Symbol.LastIndexOf('_')),
-                Point = x.value.Symbol.Substring(0, x.value.Symbol.LastIndexOf('_')).Replace("_", "."),
+                DeviceSymbol = (x.value.Symbol.EndsWith("_OUT_Of") || x.value.Symbol.EndsWith("_OUT_On")) ? x.value.Symbol.Substring(0, x.value.Symbol.LastIndexOf("_OUT_")) : x.value.Symbol.Substring(0, x.value.Symbol.LastIndexOf('_')),
+                Point =       ((x.value.Symbol.EndsWith("_OUT_Of") || x.value.Symbol.EndsWith("_OUT_On")) ? x.value.Symbol.Substring(0, x.value.Symbol.LastIndexOf("_OUT_")) : x.value.Symbol.Substring(0, x.value.Symbol.LastIndexOf('_'))).Replace("_", "."),
                 Comment = x.value.Comment,
                 Description = GetDescription(x.key.device, x.value.Comment),
                 Tooltip = GetToolTip(x.key.device, x.value.Comment),

@@ -60,6 +60,7 @@ namespace SymbolFrontend
             if (prj == null)
             {
                 MessageBox.Show($"Projekt {project} se nepoddařilo otevřít", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
                 return;
             }
 
@@ -70,6 +71,7 @@ namespace SymbolFrontend
             if (dbData == null)
             {
                 MessageBox.Show($"Datablok {db.Name} se nepodařilo v projektu {project} najít", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
                 return;
             }
 
@@ -109,6 +111,7 @@ namespace SymbolFrontend
             {
                 var dlg = new SearchFrm();
                 dlg.Input = searchtext;
+                dlg.StartPosition = FormStartPosition.CenterParent;
                 //show input dialog
                 if (dlg.ShowDialog(this) == DialogResult.OK)
                 {

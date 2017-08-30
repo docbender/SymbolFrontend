@@ -50,6 +50,7 @@ namespace SymbolFrontend
         {
             return Task.Run(() =>
             {
+                log4net.ThreadContext.Properties["datablock"] = db.Name;
                 List<CimplicityPointStructure> points = new List<CimplicityPointStructure>();
 
                 foreach (DbStructure i in db.Structure.Children)
@@ -71,7 +72,7 @@ namespace SymbolFrontend
 
                             if (ps == null)
                             {
-                                logger.Error($"Nenalezena zadna struktura pointu typu {pd.PointType} pro radek {i.ToString()}");
+                                logger.Error($"Nenalezena zadna struktura pointu typu {pd.PointType} pro radek {i.ToString()}. Definice={d.Name}");
                                 continue;
                             }
 
@@ -98,8 +99,11 @@ namespace SymbolFrontend
                 else
                     prefix = dbRow.Name.Replace("_", ".");
             }
+            else if(db.Number != 901 || !dbRow.Comment.Contains('-'))
+                prefix = dbRow.Name.Replace("_", ".");
             else
                 prefix = dbRow.Comment.Substring(0, dbRow.Comment.IndexOf('-')).Trim().Replace(" ", ".");
+
 
             if (deviceDefinition.DeviceRename != null)
             {
@@ -111,9 +115,35 @@ namespace SymbolFrontend
 
                     if (pair.Length > 1)
                     {
-                        if (prefix.Contains(pair[0]))
+                        if(Regex.IsMatch(prefix,pair[0]))
+                        {
+                            prefix = Regex.Replace(prefix, pair[0],pair[1]);
+                            break;
+                        }
+                        /*if (prefix.Contains(pair[0]))
                         {
                             prefix = prefix.Replace(pair[0], pair[1]);
+                            break;
+                        }*/
+                    }
+                }
+            }
+
+            string devicePrefixToFind = prefix;
+
+            if (deviceDefinition.DeviceAlias != null)
+            {
+                var pairs = deviceDefinition.DeviceAlias.Split(';');
+
+                foreach (var str in pairs)
+                {
+                    var pair = str.Split('|');
+
+                    if (pair.Length > 1)
+                    {
+                        if (Regex.IsMatch(devicePrefixToFind, pair[0]))
+                        {
+                            devicePrefixToFind = Regex.Replace(devicePrefixToFind, pair[0], pair[1]);
                             break;
                         }
                     }
@@ -125,12 +155,12 @@ namespace SymbolFrontend
                 Regex.IsMatch(dbRow.Comment, "(EDG)") ? "UPS" : "";
             Device deviceSymbol = null;
             if (dlKey.Length > 0)
-                deviceSymbol = deviceLists[dlKey].FirstOrDefault(y => y.Point.Equals(prefix, StringComparison.InvariantCultureIgnoreCase));
+                deviceSymbol = deviceLists[dlKey].FirstOrDefault(y => y.Point.Equals(devicePrefixToFind, StringComparison.InvariantCultureIgnoreCase));
             if (deviceSymbol == null)
-                deviceSymbol = deviceLists.SelectMany(x => x.Value.Where(y => y.Point.Equals(prefix, StringComparison.InvariantCultureIgnoreCase))).FirstOrDefault();
+                deviceSymbol = deviceLists.SelectMany(x => x.Value.Where(y => y.Point.Equals(devicePrefixToFind, StringComparison.InvariantCultureIgnoreCase))).FirstOrDefault();
             if (deviceSymbol == null)
             {
-                logger.Error($"Nenalezeno zarizeni pro point {prefix} z DB{db.Number}.{dbRow.Address}");
+                logger.Error($"Nenalezeno zarizeni pro point {devicePrefixToFind} z DB{db.Number}.{dbRow.Address}. Symbol={dbRow.Name}, Comment={dbRow.Comment}, Definice={deviceDefinition.Name}");
                 return null;
             }
 
@@ -163,7 +193,7 @@ namespace SymbolFrontend
                     address = (definition.PlcArea.Equals("DBX", StringComparison.InvariantCultureIgnoreCase)
                             ? $"{datablock}.DBX{itemAddress / 8}.{itemAddress % 8}"
                             : (definition.PlcArea.Equals("DBDF", StringComparison.InvariantCultureIgnoreCase)
-                                ? $"{datablock}.DBD{itemAddress / 8}:REAL"
+                                ? $"{datablock}.REAL{itemAddress / 8}"  //? $"{datablock}.DBD{itemAddress / 8}:REAL"
                                 : $"{datablock}.{definition.PlcArea}{itemAddress / 8}"));
                 }
 
