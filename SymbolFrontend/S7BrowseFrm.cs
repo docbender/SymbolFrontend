@@ -102,7 +102,12 @@ namespace SymbolFrontend
             listBox4.Items.Clear();
             var db = listBox1.SelectedItem as BlocksOfflineFolder;
             if (db != null)
-                listBox2.Items.AddRange(db.BlockInfos.Where(x => x.BlockType == PLCBlockType.DB).ToArray());
+            {
+                if (checkBox1.Checked)
+                    listBox2.Items.AddRange(db.BlockInfos.Where(x => x.BlockType == PLCBlockType.DB || x.BlockType == PLCBlockType.FB || x.BlockType == PLCBlockType.FC || x.BlockType == PLCBlockType.OB || x.BlockType == PLCBlockType.VAT).OrderBy(x => x.BlockType).ToArray());
+                else
+                    listBox2.Items.AddRange(db.BlockInfos.Where(x => x.BlockType == PLCBlockType.DB).ToArray());
+            }
         }
 
         private void S7BrowseFrm_Load(object sender, EventArgs e)
@@ -123,14 +128,30 @@ namespace SymbolFrontend
                 return;
             }
 
-            var db = (listBox2.SelectedItem as ProjectBlockInfo).GetBlock() as S7DataBlock;
+            var blockinfo = (listBox2.SelectedItem as ProjectBlockInfo);
 
-            label6.Text = db.BlockNumber.ToString();
-            label7.Text = db.BlockName;
-            label11.Text = db.CodeSize.ToString();
-            label13.Text = db.LastCodeChange.ToString("yy-MM-dd HH:mm:ss");
+            var block = blockinfo.GetBlock();
+            label6.Text = block.BlockNumber.ToString();
+            label7.Text = block.BlockName;            
 
-            listBox3.Items.AddRange(db.ToString().Split(new char[] { '\n' }));
+            if (blockinfo.BlockType == PLCBlockType.DB)
+            {
+                var db = blockinfo.GetBlock() as S7DataBlock;
+
+                label11.Text = db.CodeSize.ToString();
+                label13.Text = db.LastCodeChange.ToString("yy-MM-dd HH:mm:ss");
+
+                listBox3.Items.AddRange(db.ToString().Split(new char[] { '\n' }));
+            }
+            else if (blockinfo.BlockType == PLCBlockType.FB)
+            {
+                var fb = blockinfo.GetBlock() as S7FunctionBlock;
+
+                label11.Text = fb.CodeSize.ToString();
+                label13.Text = fb.LastCodeChange.ToString("yy-MM-dd HH:mm:ss");
+
+                listBox3.Items.AddRange(fb.ToString().Split(new char[] { '\n' }));
+            }
         }
 
         public Nullable<int> SelectedDbNumber
@@ -172,7 +193,7 @@ namespace SymbolFrontend
 
         private void listBox2_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            if (listBox2.SelectedItem == null)
+            if (listBox2.SelectedItem == null || (listBox2.SelectedItem as ProjectBlockInfo).BlockType != PLCBlockType.DB)
                 return;
             var db = (listBox2.SelectedItem as ProjectBlockInfo).GetBlock() as S7DataBlock;
 
@@ -212,6 +233,23 @@ namespace SymbolFrontend
         {
             this.DialogResult = DialogResult.OK;
             this.Close();
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedItem == null)
+                return;
+
+            listBox2.Items.Clear();
+
+            var db = listBox1.SelectedItem as BlocksOfflineFolder;
+            if (db != null)
+            {
+                if (checkBox1.Checked)
+                    listBox2.Items.AddRange(db.BlockInfos.Where(x => x.BlockType == PLCBlockType.DB || x.BlockType == PLCBlockType.FB || x.BlockType == PLCBlockType.FC || x.BlockType == PLCBlockType.OB || x.BlockType == PLCBlockType.VAT).OrderBy(x => x.BlockType).ToArray());
+                else
+                    listBox2.Items.AddRange(db.BlockInfos.Where(x => x.BlockType == PLCBlockType.DB).ToArray());
+            }
         }
     }
 }

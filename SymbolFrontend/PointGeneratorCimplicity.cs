@@ -58,9 +58,9 @@ namespace SymbolFrontend
 
                     var dl = definitions.Get(i);
 
-                    if (dl == null)
+                    if (dl == null || dl.Count == 0)
                     {
-                        logger.Error($"Nenalezena zadna definice pointu pro radek {i.ToString()}");
+                        logger.Error($"Nenalezena zadna definice pointu pro DB{db.Number}.{i.Address}. Symbol={i.Name}, Comment={i.Comment}");
                         continue;
                     }
 
@@ -72,7 +72,7 @@ namespace SymbolFrontend
 
                             if (ps == null)
                             {
-                                logger.Error($"Nenalezena zadna struktura pointu typu {pd.PointType} pro radek {i.ToString()}. Definice={d.Name}");
+                                logger.Error($"Nenalezena zadna struktura pointu typu {pd.PointType} pro DB{db.Number}.{i.Address}. Symbol={i.Name}, Comment={i.Comment}. Definice={d.Name}");
                                 continue;
                             }
 
@@ -99,7 +99,7 @@ namespace SymbolFrontend
                 else
                     prefix = dbRow.Name.Replace("_", ".");
             }
-            else if(db.Number != 901 || !dbRow.Comment.Contains('-'))
+            else if (db.Number != 901 || !dbRow.Comment.Contains('-'))
                 prefix = dbRow.Name.Replace("_", ".");
             else
                 prefix = dbRow.Comment.Substring(0, dbRow.Comment.IndexOf('-')).Trim().Replace(" ", ".");
@@ -115,9 +115,9 @@ namespace SymbolFrontend
 
                     if (pair.Length > 1)
                     {
-                        if(Regex.IsMatch(prefix,pair[0]))
+                        if (Regex.IsMatch(prefix, pair[0]))
                         {
-                            prefix = Regex.Replace(prefix, pair[0],pair[1]);
+                            prefix = Regex.Replace(prefix, pair[0], pair[1]);
                             break;
                         }
                         /*if (prefix.Contains(pair[0]))
@@ -239,7 +239,14 @@ namespace SymbolFrontend
 
 
             if (definition.Deadband > 0)
-                s.ANALOG_DEADBAND = definition.Deadband.ToString();
+                s.ANALOG_DEADBAND = definition.Deadband.ToString("0.#####", System.Globalization.CultureInfo.InvariantCulture);
+
+            if (definition.Conversion != 0)
+            {
+                s.CONV_TYPE = "CS";
+                s.FW_CONV_EQ = $"%P * {definition.Conversion.ToString("0.#####", System.Globalization.CultureInfo.InvariantCulture)}";
+                s.REV_CONV_EQ = $"%P / {definition.Conversion.ToString("0.#####", System.Globalization.CultureInfo.InvariantCulture)}";
+            }
 
             return s;
         }

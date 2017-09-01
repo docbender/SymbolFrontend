@@ -34,7 +34,7 @@ namespace SymbolFrontend
         /// <summary>
         /// Device name restriction (regex)
         /// </summary>
-        /// <example>"_Rdy$" - only neme ended with "_Rdy"</example>
+        /// <example>"_Rdy$" - only name ended with "_Rdy"</example>
         [JsonProperty]
         public string DeviceRestriction
         { get; set; }

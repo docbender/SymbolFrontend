@@ -101,7 +101,11 @@ namespace SymbolFrontend
         { get; set; }
 
         [JsonProperty]
-        public int Deadband
-        { get; set; } = 0;
+        public double Deadband
+        { get; set; } = 0.0;
+
+        [JsonProperty]
+        public double Conversion
+        { get; set; } = 0.0;
     }
 }
