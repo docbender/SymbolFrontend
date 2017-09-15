@@ -69,6 +69,10 @@ namespace SymbolFrontend
             GetTable("NN", "(_NN_)");
             GetTable("VN", "(_VN_)");
             GetTable("UPS", "(_EDG_)");
+            GetTable("VZT", "(_VZT_)");
+            GetTable("OSV", "(_OSV_)");
+            GetTable("POZ", "(_POZ_)");
+            GetTable("MFV", "(_MFV_)");
 
             GetCustomTables();
         }

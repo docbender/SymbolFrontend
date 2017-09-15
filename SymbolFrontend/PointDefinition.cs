@@ -44,6 +44,11 @@ namespace SymbolFrontend
         public string Equation
         { get; set; }
 
+
+        [JsonProperty]
+        public string EquationType
+        { get; set; }
+
         [JsonProperty]
         public string Description
         { get; set; }
@@ -107,5 +112,13 @@ namespace SymbolFrontend
         [JsonProperty]
         public double Conversion
         { get; set; } = 0.0;
+
+        [JsonProperty]
+        public string Trigger
+        { get; set; }
+
+        [JsonProperty]
+        public string Reset
+        { get; set; }
     }
 }

@@ -32,7 +32,7 @@ namespace SymbolFrontend
             if (ProjectPath.Length > 0)
                 LoadProject(ProjectPath);
 
-            if (Properties.Settings.Default.projectfolder.Length > 0)
+            if (Properties.Settings.Default.projectfolder != null && Properties.Settings.Default.projectfolder.Length > 0)
             {
                 for (int i=0;i<listBox1.Items.Count;i++)
                 {
@@ -99,12 +99,20 @@ namespace SymbolFrontend
 
             listBox2.Items.Clear();
             listBox3.Items.Clear();
-            listBox4.Items.Clear();
-            var db = listBox1.SelectedItem as BlocksOfflineFolder;
+            
+            if(listBox4.Items.Count > 0 && listBox1.SelectedItem is BlocksOfflineFolder)
+            {
+                foreach (var i in listBox4.Items)
+                    (i as DbClass).Path = (listBox1.SelectedItem as BlocksOfflineFolder).StructuredFolderName;
+            }
+            else
+                listBox4.Items.Clear();
+
+                var db = listBox1.SelectedItem as BlocksOfflineFolder;
             if (db != null)
             {
                 if (checkBox1.Checked)
-                    listBox2.Items.AddRange(db.BlockInfos.Where(x => x.BlockType == PLCBlockType.DB || x.BlockType == PLCBlockType.FB || x.BlockType == PLCBlockType.FC || x.BlockType == PLCBlockType.OB || x.BlockType == PLCBlockType.VAT).OrderBy(x => x.BlockType).ToArray());
+                    listBox2.Items.AddRange(db.BlockInfos.Where(x => x.BlockType == PLCBlockType.DB || x.BlockType == PLCBlockType.FB || x.BlockType == PLCBlockType.FC || x.BlockType == PLCBlockType.OB || x.BlockType == PLCBlockType.UDT || x.BlockType == PLCBlockType.VAT).OrderBy(x => x.BlockType).ToArray());
                 else
                     listBox2.Items.AddRange(db.BlockInfos.Where(x => x.BlockType == PLCBlockType.DB).ToArray());
             }
@@ -143,9 +151,27 @@ namespace SymbolFrontend
 
                 listBox3.Items.AddRange(db.ToString().Split(new char[] { '\n' }));
             }
-            else if (blockinfo.BlockType == PLCBlockType.FB)
+            else if (blockinfo.BlockType == PLCBlockType.FB || blockinfo.BlockType == PLCBlockType.FC || blockinfo.BlockType == PLCBlockType.OB)
             {
                 var fb = blockinfo.GetBlock() as S7FunctionBlock;
+
+                label11.Text = fb.CodeSize.ToString();
+                label13.Text = fb.LastCodeChange.ToString("yy-MM-dd HH:mm:ss");
+
+                listBox3.Items.AddRange(fb.ToString().Split(new char[] { '\n' }));
+            }
+            else if (blockinfo.BlockType == PLCBlockType.VAT)
+            {
+                var fb = blockinfo.GetBlock() as S7VATBlock;
+
+                label11.Text = fb.CodeSize.ToString();
+                label13.Text = fb.LastCodeChange.ToString("yy-MM-dd HH:mm:ss");
+
+                listBox3.Items.AddRange(fb.ToString().Split(new char[] { '\n' }));
+            }
+            else if (blockinfo.BlockType == PLCBlockType.UDT)
+            {
+                var fb = blockinfo.GetBlock() as S7DataBlock;
 
                 label11.Text = fb.CodeSize.ToString();
                 label13.Text = fb.LastCodeChange.ToString("yy-MM-dd HH:mm:ss");
@@ -246,7 +272,7 @@ namespace SymbolFrontend
             if (db != null)
             {
                 if (checkBox1.Checked)
-                    listBox2.Items.AddRange(db.BlockInfos.Where(x => x.BlockType == PLCBlockType.DB || x.BlockType == PLCBlockType.FB || x.BlockType == PLCBlockType.FC || x.BlockType == PLCBlockType.OB || x.BlockType == PLCBlockType.VAT).OrderBy(x => x.BlockType).ToArray());
+                    listBox2.Items.AddRange(db.BlockInfos.Where(x => x.BlockType == PLCBlockType.DB || x.BlockType == PLCBlockType.FB || x.BlockType == PLCBlockType.FC || x.BlockType == PLCBlockType.OB || x.BlockType == PLCBlockType.UDT || x.BlockType == PLCBlockType.VAT).OrderBy(x => x.BlockType).ToArray());
                 else
                     listBox2.Items.AddRange(db.BlockInfos.Where(x => x.BlockType == PLCBlockType.DB).ToArray());
             }

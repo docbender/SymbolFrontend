@@ -82,7 +82,6 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.listBox1);
             this.ForeColor = System.Drawing.Color.White;
-            this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "LogFrm";
             this.ShowIcon = false;

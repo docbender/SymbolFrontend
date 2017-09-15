@@ -98,6 +98,12 @@ namespace SymbolFrontend
                     prefix = Regex.Replace(dbRow.Name, deviceDefinition.DeviceRestriction, "").Replace("_", ".");
                 else
                     prefix = dbRow.Name.Replace("_", ".");
+
+                if (db.Number == 910 || db.Number == 1010)
+                {
+                    var dot = prefix.IndexOf('.');
+                    prefix = prefix.Substring(0, dot) + ".NN" + prefix.Substring(dot);
+                }
             }
             else if (db.Number != 901 || !dbRow.Comment.Contains('-'))
                 prefix = dbRow.Name.Replace("_", ".");
@@ -176,6 +182,9 @@ namespace SymbolFrontend
             if (definition.PointType.Equals("virtual", StringComparison.InvariantCultureIgnoreCase))
                 s.EQUATION = definition.Equation.Replace("@", prefix);
 
+            if (definition.EquationType != null)
+                s.CALC_TYPE = definition.EquationType;
+
             if (definition.PointType.Equals("device", StringComparison.InvariantCultureIgnoreCase))
             {
                 s.DEVICE_ID = "PLC";
@@ -248,23 +257,44 @@ namespace SymbolFrontend
                 s.REV_CONV_EQ = $"%P / {definition.Conversion.ToString("0.#####", System.Globalization.CultureInfo.InvariantCulture)}";
             }
 
+            if (definition.Trigger != null)
+            {
+                s.TRIG_PT = definition.Trigger;
+            }
+
+            if (definition.Reset != null)
+            {
+                s.RESET_PT = definition.Reset;
+            }
+
             return s;
         }
 
         static string GetAlarmClass(string sourceClass, Device symbol)
         {
-            if (!sourceClass.Equals("E") && Regex.IsMatch(symbol.DeviceSymbol, "(NN)|(VN)|(EDG)"))
+            if (sourceClass.Equals("E"))
+                return sourceClass;
+
+            if (Regex.IsMatch(symbol.DeviceSymbol, "(NN)|(VN)|(EDG)"))
             {
                 if (symbol.Location != null && symbol.Location.Equals("PTO1") || symbol.Location.Equals("PTO2"))
                     return $"{sourceClass}EP";
                 else
                     return $"{sourceClass}ET";
             }
-            else
-                return sourceClass;
+            else if (Regex.IsMatch(symbol.DeviceSymbol, "(OSV)"))
+                return $"{sourceClass}O";
+            else if (Regex.IsMatch(symbol.DeviceSymbol, "(VZT)|(MFV)"))
+                return $"{sourceClass}VO";
+            else if (Regex.IsMatch(symbol.DeviceSymbol, "(POZ)"))
+            {
+                return $"{sourceClass}VODA";
+            }
+
+            return sourceClass;
         }
 
-        static string GetDeviceAlarmDescription(DbClass db, DbStructure dbRow, string device, Device symbol)
+            static string GetDeviceAlarmDescription(DbClass db, DbStructure dbRow, string device, Device symbol)
         {
             //var symbol = deviceList.FirstOrDefault(x => x.Point.Equals(device, StringComparison.InvariantCultureIgnoreCase));
 

@@ -76,8 +76,8 @@ namespace Archiver
             byte[] buffer = new byte[4096];
             string fileRelativePath = (relativePath.Length > 1 ? relativePath : string.Empty) + Path.GetFileName(file);
             ZipEntry entry = new ZipEntry(fileRelativePath);
-
-            entry.DateTime = DateTime.Now;
+            
+            entry.DateTime = File.GetLastWriteTime(file);
             zStream.PutNextEntry(entry);
 
             using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
