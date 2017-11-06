@@ -59,7 +59,7 @@ namespace SymbolFrontend
 
             if (prj == null)
             {
-                MessageBox.Show($"Projekt {project} se nepoddařilo otevřít", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Projekt {project} se nepodařilo otevřít", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.Close();
                 return;
             }

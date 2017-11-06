@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -18,12 +19,20 @@ namespace SymbolFrontend
             }
         }
 
+        /// <summary>
+        /// Get device definition according to datablock line
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
         public List<PointDeviceDefinition> Get(DbStructure row)
         {
             var defs = new List<PointDeviceDefinition>();
 
             foreach (var i in this.Values)
             {
+                if (i.Virtual)
+                    continue;
+
                 bool can = false;
 
                 if (i.TypeRestriction != null && i.TypeRestriction.Length > 0)
@@ -58,6 +67,19 @@ namespace SymbolFrontend
 
 
             return defs;
+        }
+
+        /// <summary>
+        /// Get definition according to definition name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public PointDeviceDefinition Get(string name)
+        {
+            if (this.Keys.Contains(name))
+                return this[name];
+            else
+                return null;
         }
 
         public Task Load()

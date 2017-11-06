@@ -73,6 +73,7 @@ namespace SymbolFrontend
             GetTable("OSV", "(_OSV_)");
             GetTable("POZ", "(_POZ_)");
             GetTable("MFV", "(_MFV_)");
+            GetTable("EZS", "(_EZS_)");
 
             GetCustomTables();
         }

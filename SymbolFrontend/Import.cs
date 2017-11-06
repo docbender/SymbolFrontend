@@ -13,13 +13,13 @@ namespace SymbolFrontend
         public delegate void EventNewLine(object sender, string line);
         public event EventNewLine Newline;
 
-        public Task Run(string cimpath, string project, string[] files)
+        public Task Run(string cimpath, string project, IEnumerable<string> files, bool dynamic)
         {
             return Task.Run(() =>
             {
                 foreach (var s in files)
                 {
-                    var si = new ProcessStartInfo(cimpath + $"\\clie.exe", $"import \"{s}\"");
+                    var si = new ProcessStartInfo(cimpath + $"\\clie.exe", $"import \"{s}\"{(dynamic?" -y":"")}");
                     si.UseShellExecute = false;
                     si.CreateNoWindow = true;
                     si.RedirectStandardOutput = true;

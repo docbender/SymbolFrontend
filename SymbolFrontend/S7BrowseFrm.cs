@@ -223,15 +223,8 @@ namespace SymbolFrontend
                 return;
             var db = (listBox2.SelectedItem as ProjectBlockInfo).GetBlock() as S7DataBlock;
 
-            var dbc = new DbClass()
-            {
-                Name = db.BlockName,
-                Number = db.BlockNumber,
-                Items = db.Structure.Children.Count,
-                ItemDependencies = string.Join(";", db.Structure.Children.Select(x =>(x as S7DataRow).DataTypeAsString).Distinct()),
-                Path = db.ParentFolder.StructuredFolderName,
-                Structure = new SymbolFrontend.DbStructure(db.Structure)
-            };
+            var dbc = new DbClass();
+            dbc.CopyFrom(db);
 
             bool isIn = false;
             foreach (DbClass v in listBox4.Items)

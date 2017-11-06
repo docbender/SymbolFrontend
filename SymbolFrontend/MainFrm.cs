@@ -1,4 +1,7 @@
-﻿using log4net;
+﻿using DotNetSiemensPLCToolBoxLibrary.DataTypes;
+using DotNetSiemensPLCToolBoxLibrary.DataTypes.Blocks.Step7V5;
+using DotNetSiemensPLCToolBoxLibrary.Projectfiles;
+using log4net;
 using log4net.Appender;
 using log4net.Repository.Hierarchy;
 using System;
@@ -23,6 +26,7 @@ namespace SymbolFrontend
         SymbolTable symbols = new SymbolTable();
         DefinitionCollection definitions = new DefinitionCollection();
         C32n pointStructures = new C32n();
+        public IEnumerable<string> LastImport { get; protected set; }
         public MainFrm()
         {
             InitializeComponent();
@@ -235,6 +239,14 @@ namespace SymbolFrontend
                 }
 
                 mappender.Clear();
+
+
+                if (!RefreshDatablock(SelectedDb))
+                {
+                    if (MessageBox.Show($"Chyba při provádění refreshe databloků z projektu. Pokračovat s offline daty?", "Dotaz", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                        return;
+                }
+
                 await PointGeneratorCimplicity.Run(SelectedDb, definitions, pointStructures, dL);
             }
             catch (AggregateException ex)
@@ -254,17 +266,53 @@ namespace SymbolFrontend
             var ev = mappender.PopAllEvents();
             if (ev != null && ev.Length > 0)
             {
-                if(MessageBox.Show("Během generování se vyskytly chyby. Chceš je zobrazit?", "Upozornění", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (MessageBox.Show("Během generování se vyskytly chyby. Chceš je zobrazit?", "Upozornění", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    var dlg = new LogFrm(ev.OrderBy(x => x.Properties["datablock"]).Select(x=>x.RenderedMessage).ToArray());
+                    var dlg = new LogFrm(ev.OrderBy(x => x.Properties["datablock"]).Select(x => x.RenderedMessage).ToArray());
                     dlg.Show(this);
                 }
             }
         }
 
+        static bool RefreshDatablock(DbCollection datablocks)
+        {
+            string project = Properties.Settings.Default.projectpath;
+
+            if (!File.Exists(project))
+            {
+                MessageBox.Show($"Projekt {project} neexistuje", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+            Project tmp = Projects.LoadProject(project, false);
+            var prj = tmp as Step7ProjectV5;
+
+            if (prj == null)
+            {
+                MessageBox.Show($"Projekt {project} se nepodařilo otevřít", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            foreach (var db in datablocks)
+            {
+                var dbData = prj.BlocksOfflineFolders.FirstOrDefault(x => x.StructuredFolderName.Equals(Properties.Settings.Default.projectfolder))
+                ?.BlockInfos?.Where(z => z.BlockType == PLCBlockType.DB)
+                ?.Select(c => c.GetBlock() as S7DataBlock)
+                ?.FirstOrDefault(v => v.BlockName.Equals(db.Name));
+                if (dbData == null)
+                {
+                    MessageBox.Show($"Datablok {db.Name} se nepodařilo v projektu {project} najít", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
+                db.CopyFrom(dbData);
+            }
+            return true;
+        }
+
         private void MainFrm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default.Save();
+            File.WriteAllText(DbLocation, SelectedDb.Serialize());
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -305,6 +353,11 @@ namespace SymbolFrontend
 
         private void button8_Click(object sender, EventArgs e)
         {
+            ImportPoints(true, checkBox3.Checked);
+        }
+
+        private void ImportPoints(bool all, bool dynamic)
+        {
             if (!Directory.Exists(PointGeneratorCimplicity.Location))
             {
                 MessageBox.Show($"Cesta k pointům nenalezena ({PointGeneratorCimplicity.Location})", "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -329,14 +382,21 @@ namespace SymbolFrontend
                     return;
                 }
 
-                var dlg = new ImportFrm(cimpath, "C:\\TPCH", files.ToArray());
+                var dlg = new ImportFrm(cimpath, "C:\\TPCH", files.ToArray(), all, dynamic, LastImport);
                 dlg.ShowDialog(this);
+
+                LastImport = dlg.LastImport;
 
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            ImportPoints(false, checkBox3.Checked);
         }
 
         private void listBox2_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -347,5 +407,7 @@ namespace SymbolFrontend
             var dlg = new DbViewFrm(listBox2.SelectedItem as DbClass, Properties.Settings.Default.projectpath);
             dlg.Show();
         }
+
+
     }
 }

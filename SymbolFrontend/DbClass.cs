@@ -50,6 +50,19 @@ namespace SymbolFrontend
         public DbStructure Structure
         { get; set; }
 
+        /// <summary>
+        /// Copy method
+        /// </summary>
+        /// <param name="db"></param>
+        public void CopyFrom(DotNetSiemensPLCToolBoxLibrary.DataTypes.Blocks.Step7V5.S7DataBlock db)
+        {
+            Name = db.BlockName;
+            Number = db.BlockNumber;
+            Items = db.Structure.Children.Count;
+            ItemDependencies = string.Join(";", db.Structure.Children.Select(x => (x as DotNetSiemensPLCToolBoxLibrary.DataTypes.Blocks.Step7V5.S7DataRow).DataTypeAsString).Distinct());
+            Path = db.ParentFolder.StructuredFolderName;
+            Structure = new SymbolFrontend.DbStructure(db.Structure);
+        }
 
         public override string ToString()
         {

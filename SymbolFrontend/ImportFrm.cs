@@ -18,32 +18,51 @@ namespace SymbolFrontend
         string cimpath, project;
         string[] files;
         string logFile = "";
+        bool all = false, dynamic = false;
+        public IEnumerable<string> LastImport { get; protected set; }
 
         public ImportFrm()
         {
             InitializeComponent();
         }
 
-        public ImportFrm(string cimpath, string project, string[] files)
+        public ImportFrm(string cimpath, string project, string[] files, bool all, bool dynamic, IEnumerable<string> lastImport)
             : this()
         {
             this.cimpath = cimpath;
             this.project = project;
             this.files = files;
+            this.all = all;
+            this.dynamic = dynamic;
+            LastImport = lastImport;
         }
 
         private async void ImportFrm_Load(object sender, EventArgs e)
         {
-            await Import();
+            if(!all)
+            {
+                var dlg = new SelectorFrm(files, LastImport);
+                dlg.ShowDialog();
+
+                await Import(dlg.Selected, dynamic);
+            }
+            else
+                await Import(files, dynamic);
         }
 
         private async void button2_Click(object sender, EventArgs e)
         {
-            await Import();
+            if (LastImport == null)
+                return;
+
+            await Import(LastImport, dynamic);
         }
 
-        private async Task Import()
+        private async Task Import(IEnumerable<string> files, bool dynamic)
         {
+            if (files == null)
+                return;
+            LastImport = files;
             button2.Enabled = false;
             listBox1.Items.Clear();
 
@@ -54,7 +73,7 @@ namespace SymbolFrontend
 
             try
             {
-                await i.Run(cimpath, project, files);
+                await i.Run(cimpath, project, files, dynamic);
             }
             catch (AggregateException ex)
             {

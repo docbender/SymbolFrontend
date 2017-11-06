@@ -22,12 +22,19 @@ namespace Archiver
                 throw new DirectoryNotFoundException();
             }
 
-            ZipOutputStream zip = new ZipOutputStream(File.Create(targetFile));
+            var tempTarget = targetFile + ".tmp";
+
+            ZipOutputStream zip = new ZipOutputStream(File.Create(tempTarget));
             zip.SetLevel(9);
             ZipFolder(path, Path.GetFileName(path), path, zip, excluedeFileMask);
             zip.Finish();
             var size = zip.Length;
             zip.Close();
+
+            if (File.Exists(targetFile))
+                File.Delete(targetFile);
+
+            File.Move(tempTarget, targetFile);
 
             return size;
         }

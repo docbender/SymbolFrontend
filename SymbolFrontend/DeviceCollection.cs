@@ -15,9 +15,16 @@ namespace SymbolFrontend
             get;set;
         }
 
+        /// <summary>
+        /// Indicate custom table definition (jsond file)
+        /// </summary>
+        public bool Custom { get; set; } = false;
+
         public static DeviceCollection Deserialize(string json)
         {
-            return JsonConvert.DeserializeObject<DeviceCollection>(json, new JsonSerializerSettings() { });
+            var devices = JsonConvert.DeserializeObject<DeviceCollection>(json, new JsonSerializerSettings() { });
+            devices.Custom = true;
+            return devices;
         }
     }
 }

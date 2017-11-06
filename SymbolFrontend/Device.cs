@@ -44,6 +44,11 @@ namespace SymbolFrontend
             get; set;
         }
 
+        public string VirtualType
+        {
+            get; set;
+        }        
+
         public override string ToString()
         {
             return $"Point={Point}";

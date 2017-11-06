@@ -120,5 +120,9 @@ namespace SymbolFrontend
         [JsonProperty]
         public string Reset
         { get; set; }
+
+        [JsonProperty]
+        public int Elements
+        { get; set; } = 1;
     }
 }

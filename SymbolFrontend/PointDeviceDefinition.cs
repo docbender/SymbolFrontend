@@ -90,6 +90,13 @@ namespace SymbolFrontend
         public List<PointDefinition> Points
         { get; set; }
 
+        /// <summary>
+        /// Is this virtul device(not in PLC)
+        /// </summary>
+        [JsonProperty]
+        public bool Virtual
+        { get; set; } = false;
+
         public override string ToString()
         {
             return $"{Name}:  Typ={TypeRestriction??"Vše"} Komentář={CommentRestriction ?? ""} Zařízení={DeviceRestriction ?? ""}";

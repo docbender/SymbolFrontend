@@ -51,12 +51,14 @@
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.listBox2 = new System.Windows.Forms.ListBox();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.button10 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
             this.button7 = new System.Windows.Forms.Button();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.button5 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.listBox3 = new System.Windows.Forms.ListBox();
+            this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -310,6 +312,8 @@
             // groupBox6
             // 
             this.groupBox6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox6.Controls.Add(this.checkBox3);
+            this.groupBox6.Controls.Add(this.button10);
             this.groupBox6.Controls.Add(this.button8);
             this.groupBox6.Controls.Add(this.button7);
             this.groupBox6.Controls.Add(this.checkBox1);
@@ -324,15 +328,27 @@
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Dostupné definice pointů pro zařízení";
             // 
+            // button10
+            // 
+            this.button10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.button10.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button10.Location = new System.Drawing.Point(18, 256);
+            this.button10.Name = "button10";
+            this.button10.Size = new System.Drawing.Size(152, 23);
+            this.button10.TabIndex = 12;
+            this.button10.Text = "Naimportovat výběr";
+            this.button10.UseVisualStyleBackColor = true;
+            this.button10.Click += new System.EventHandler(this.button10_Click);
+            // 
             // button8
             // 
             this.button8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.button8.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button8.Location = new System.Drawing.Point(136, 256);
+            this.button8.Location = new System.Drawing.Point(281, 256);
             this.button8.Name = "button8";
             this.button8.Size = new System.Drawing.Size(152, 23);
             this.button8.TabIndex = 11;
-            this.button8.Text = "Naimportovat pointy";
+            this.button8.Text = "Naimportovat vše";
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
@@ -340,7 +356,7 @@
             // 
             this.button7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.button7.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button7.Location = new System.Drawing.Point(215, 227);
+            this.button7.Location = new System.Drawing.Point(228, 227);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(152, 23);
             this.button7.TabIndex = 10;
@@ -352,7 +368,7 @@
             // 
             this.checkBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(109, 204);
+            this.checkBox1.Location = new System.Drawing.Point(111, 204);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(232, 17);
             this.checkBox1.TabIndex = 9;
@@ -363,7 +379,7 @@
             // 
             this.button5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.button5.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button5.Location = new System.Drawing.Point(57, 227);
+            this.button5.Location = new System.Drawing.Point(70, 227);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(152, 23);
             this.button5.TabIndex = 2;
@@ -375,7 +391,7 @@
             // 
             this.button4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.button4.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button4.Location = new System.Drawing.Point(136, 163);
+            this.button4.Location = new System.Drawing.Point(147, 163);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(156, 23);
             this.button4.TabIndex = 1;
@@ -397,6 +413,16 @@
             this.listBox3.Size = new System.Drawing.Size(415, 132);
             this.listBox3.TabIndex = 0;
             this.listBox3.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listBox3_MouseDoubleClick);
+            // 
+            // checkBox3
+            // 
+            this.checkBox3.AutoSize = true;
+            this.checkBox3.Location = new System.Drawing.Point(189, 261);
+            this.checkBox3.Name = "checkBox3";
+            this.checkBox3.Size = new System.Drawing.Size(78, 17);
+            this.checkBox3.TabIndex = 13;
+            this.checkBox3.Text = "Dynamicky";
+            this.checkBox3.UseVisualStyleBackColor = true;
             // 
             // MainFrm
             // 
@@ -460,6 +486,8 @@
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.Button button7;
         private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Button button10;
+        private System.Windows.Forms.CheckBox checkBox3;
     }
 }
 
